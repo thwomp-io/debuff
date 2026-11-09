@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>{{.Title}} · Debuff</title>
+{{if or .Scanning .Upgrading}}<meta http-equiv="refresh" content="3">{{end}}
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+{{define "row"}}<details class="row">
+  <summary>
+    <span class="sev">{{if .KEV}}<b class="exploited">Exploited</b>{{else}}<span class="sev-{{.SeverityClass}}">{{.Severity}}</span>{{end}}</span>
+    <span class="cve">{{.CVE}}</span>
+    <span class="title">{{.Title}}</span>
+    <span class="epss">{{.EPSS}}</span>
+  </summary>
+  <div class="detail">
+    {{if .Description}}<p>{{.Description}}</p>{{end}}
+    <dl>
+      <dt>Severity</dt><dd>{{.Severity}}</dd>
+      <dt>Label</dt><dd>{{.Label}}</dd>
+      {{if .FixedIn}}<dt>Fixed in</dt><dd>{{.FixedIn}}</dd>{{end}}
+      {{if .Date}}<dt>Published</dt><dd>{{.Date}}</dd>{{end}}
+      <dt>Why this label</dt><dd>{{.Evidence}}</dd>
+      {{if .URL}}<dt>Source</dt><dd><a href="{{.URL}}" rel="noreferrer">{{.URL}}</a></dd>{{end}}
+    </dl>
+  </div>
+</details>
+{{end}}
+{{define "icon"}}{{if .Facts.Icon}}<img class="icon" src="/icon/{{.Facts.Icon}}" alt="" width="44" height="44">{{else}}<span class="icon letter" aria-hidden="true">{{.Letter}}</span>{{end}}{{end}}
+{{define "tags"}}<div class="tags">{{if .UpdateAvailable}}<span class="tag" title="The newest version Homebrew lists">v{{.Facts.Latest}} available</span>{{end}}{{if .Facts.Unsupported}}<span class="tag" title="{{.Facts.Note}}">out of support</span>{{end}}</div>{{end}}
+{{define "subtitle"}}<p class="subtitle">{{with .Facts.Version}}v{{.}}{{end}}{{if .Current}}{{if .Facts.Version}}, {{end}}<span title="The newest version Homebrew lists, which can lag the vendor">latest</span>{{end}}{{if .UpdateUnknown}}{{if .Facts.Version}}, newest version unknown{{else}}Newest version unknown{{end}}{{end}}</p>{{end}}
+{{define "numbers"}}<div class="nums">
+  <div class="{{if .Exploited}}num-exploited{{else}}num-zero{{end}}"><b>{{.Exploited}}</b><span>exploited</span>{{if .Exploited}}<span>{{.ExploitedSure}} confirmed</span>{{end}}</div>
+  <div class="{{if not .Critical}}num-zero{{end}}"><b>{{.Critical}}</b><span>critical</span></div>
+  <div class="{{if not .High}}num-zero{{end}}"><b>{{.High}}</b><span>high</span></div>
+  <div class="{{if not .TopEPSS}}num-zero{{end}}"><b>{{if .TopEPSS}}{{.TopEPSS}}{{else}}–{{end}}</b><span>top EPSS</span></div>
+</div>{{end}}
+{{define "facts"}}<dl class="facts">
+  {{with .Status}}<dt>Status</dt><dd>{{.}}</dd>{{end}}
+  {{with .Updated}}<dt>Updated</dt><dd>{{.}}</dd>{{end}}
+  {{with .BuiltOn}}<dt>Built on</dt><dd>{{.}}</dd>{{end}}
+  {{with .Behind}}<dt>Behind since</dt><dd>{{.}}</dd>{{end}}
+  {{with .Caveat}}<dt>Note</dt><dd>{{.}}</dd>{{end}}
+  {{if .Change.Any}}<dt>Last change</dt><dd class="changed">{{if ne .Change.From .Change.To}}v{{.Change.From}} → v{{.Change.To}}, {{end}}{{.Change.Closed}} closed, {{.Change.New}} new</dd>{{end}}
+</dl>{{end}}
+<div class="shell">
+<nav class="side" aria-label="Views">
+  <h1>Debuff</h1>
+  <ul>
+    {{range .Views}}<li><a href="{{.Href}}"{{if .Current}} class="current" aria-current="page"{{end}}><span>{{.Name}}</span>{{if .Count}}<span class="count">{{.Count}}</span>{{end}}</a></li>
+    {{end}}
+  </ul>
+  <p class="meta">v{{.Version}}</p>
+</nav>
+<main class="pane">
+  {{if .Demo}}<p class="banner">Sample data. These findings are made up, and nothing on this machine was scanned.</p>{{end}}
+  {{if .Degraded}}<div class="banner"><p>Some sources didn't answer, so this scan may be incomplete.</p><ul>{{range .Degraded}}<li>{{.}}</li>{{end}}</ul></div>{{end}}
+  {{if .ScanFailure}}<p class="banner">The last scan failed, so this is still the earlier one: {{.ScanFailure}}</p>{{end}}
+  {{if .PressFailure}}<p class="banner">{{.PressFailure}}</p>{{end}}
+  {{if .StaleSince}}<p class="banner">The newest scan is from {{.StaleSince}}, so this may be out of date. One should run every morning.</p>{{end}}
+  <header class="pane-head">
+    <div class="heading">{{if .BackHref}}<a class="back" href="{{.BackHref}}">Inbox</a>{{end}}<h2>{{.Title}}</h2></div>
+    <div class="controls">
+      {{if and .OnUpdates .CanAct .FormulaCount}}<form class="act act-primary update-all" method="post" action="/update">
+        <input type="hidden" name="all" value="1"><input type="hidden" name="min" value="{{.CurrentFilter}}">
+        <button type="submit"{{if or .Upgrading .Scanning}} disabled{{end}} title="One brew upgrade of every Homebrew row below">{{if .Upgrading}}Updating…{{else}}Update all ({{.FormulaCount}}){{end}}</button>
+      </form>{{end}}
+      {{if .CanScan}}<form class="rescan" method="post" action="/rescan">
+        <input type="hidden" name="view" value="{{.CurrentView}}"><input type="hidden" name="min" value="{{.CurrentFilter}}"><input type="hidden" name="app" value="{{.CurrentApp}}">
+        <button type="submit"{{if .Scanning}} disabled{{end}}>{{if .Scanning}}Scanning…{{else}}Rescan{{end}}</button>
+      </form>{{end}}
+      {{if not .OnUpdates}}<div class="filter" role="group" aria-label="Minimum severity">
+        {{range .Filters}}<a href="{{.Href}}"{{if .Current}} class="current" aria-current="true"{{end}}>{{.Name}}</a>{{end}}
+      </div>{{end}}
+    </div>
+  </header>
+  <div class="summary">
+    {{if and .ScannedAt (not .Demo)}}<span>Scanned {{.ScannedAt}}.</span>{{end}}
+    {{if .Upgrading}}<span>Updating {{.Upgrading}}. This page checks again by itself.</span>{{end}}
+    {{with .UpgradeDone}}<span><b>{{.}}</b></span>{{end}}
+    {{if .OnUpdates}}<span>Newest versions come from Homebrew and Software Update, and can trail a vendor.</span>{{end}}
+    {{if .Scanning}}<span>Scanning since {{.ScanStarted}}. These are the earlier results until it finishes.</span>
+    {{else}}{{with .Change}}<span>{{if .None}}No change in findings since the scan at {{.Since}}.{{else}}{{if .Unchanged}}No change since the scan at {{.Unchanged}}. Compared with the one at {{.Since}}: {{else}}Since the scan at {{.Since}}: {{end}}<b>{{.Closed}} closed</b>, <b>{{.New}} new</b>, exploited {{.ExploitedBefore}} → {{.ExploitedNow}}{{range .Removed}}, {{.}} removed{{end}}.{{end}}</span>{{end}}{{end}}
+    {{if .Hidden}}<a href="{{.ShowAll}}" title="{{.FilterNote}}, plus anything known exploited">{{.Hidden}} lower-severity hidden</a>{{end}}
+  </div>
+  {{if .OnUpdates}}
+  {{if .Updates}}
+  <section class="updates" aria-label="Available updates">
+    <div class="update update-head" aria-hidden="true"><span></span><span>Name</span><span>Version</span><span>Open now</span><span>Action</span></div>
+    {{range .Updates}}{{template "update" (updateArgs . $)}}{{end}}
+  </section>
+  {{else}}<section class="empty"><h3>{{.EmptyTitle}}</h3><p>{{.EmptyBody}}</p></section>{{end}}
+  {{if or .StoreApps .UnknownApps}}<section class="not-listed" aria-label="What this list can't see">
+    <h4>Not listed</h4>
+    {{if .StoreApps}}<div class="not-listed-row"><p>Debuff can't see the newest version of App Store apps: {{range $i, $a := .StoreApps}}{{if $i}}, {{end}}{{$a}}{{end}}.</p>
+      {{if .CanAct}}<form class="act" method="post" action="/update"><input type="hidden" name="store" value="1"><button type="submit">App Store</button></form>{{end}}</div>{{end}}
+    {{if .UnknownApps}}<p>Homebrew doesn't list these, so their newest version is unknown: {{range $i, $a := .UnknownApps}}{{if $i}}, {{end}}{{$a}}{{end}}.</p>{{end}}
+  </section>{{end}}
+  {{else}}
+  {{if .Cards}}
+  {{if .BackHref}}
+  {{range .Cards}}
+  <section class="focus">
+    <div class="card-head">{{template "icon" .}}<div class="named">{{template "subtitle" .}}<p class="subtitle">{{.Count}} finding{{if ne .Count 1}}s{{end}}, {{.Labels}}</p></div>{{template "tags" .}}</div>
+    {{with .Facts.Why}}<p class="why">{{.}}</p>{{end}}
+    {{template "numbers" .}}
+    {{template "facts" .}}
+    <div class="flow">{{range .Rows}}{{template "row" .}}{{end}}</div>
+  </section>
+  {{end}}
+  {{else}}
+  <div class="cards">
+    {{range .Cards}}
+    <section class="card">
+      <div class="card-head">{{template "icon" .}}<div class="named"><h3><a href="{{.AllHref}}">{{.Name}}</a></h3>{{template "subtitle" .}}</div>{{template "tags" .}}</div>
+      {{with .Facts.Why}}<p class="why">{{.}}</p>{{end}}
+      {{template "numbers" .}}
+      {{template "facts" .}}
+      <details class="findings">
+        <summary><span class="chevron" aria-hidden="true"></span>{{.Count}} finding{{if ne .Count 1}}s{{end}}</summary>
+        <div class="list">{{range .Rows}}{{template "row" .}}{{end}}</div>
+        {{if gt .Count (len .Rows)}}<a class="all" href="{{.AllHref}}">All {{.Count}} findings</a>{{end}}
+      </details>
+    </section>
+    {{end}}
+  </div>
+  {{end}}
+  {{else}}
+  {{if not (or .Checked .Unchecked)}}<section class="empty">
+    <h3>{{.EmptyTitle}}</h3>
+    <p>{{.EmptyBody}}</p>
+  </section>{{end}}
+  {{end}}
+  {{if or .Checked .Unchecked}}
+  <section class="others" aria-label="Everything else on this machine">
+    <h3>Also on this machine</h3>
+    <p class="others-note"><span class="dot" aria-hidden="true"></span>Running now</p>
+    {{if .Checked}}
+    <h4>Checked, with nothing at this severity</h4>
+    <div class="group">{{range .Checked}}{{template "other" .}}{{end}}</div>
+    {{end}}
+    {{if .Unchecked}}
+    <h4>No CVE source</h4>
+    <p class="group-note">Nothing here could check these apps, which doesn't make them clean.</p>
+    <div class="group">{{range .Unchecked}}{{template "other" .}}{{end}}</div>
+    {{end}}
+  </section>
+  {{end}}
+  {{end}}
+</main>
+</div>
+{{define "update"}}{{with .Row}}<div class="update">
+  {{template "icon" .}}
+  <div class="update-name"><b>{{.Name}}</b><span>{{.How}}{{if .Restart}} Needs a restart.{{end}}</span></div>
+  <div class="update-version">{{with .Installed}}<span>v{{.}}</span> <span aria-hidden="true">→</span> {{end}}<b>v{{.Latest}}</b></div>
+  <div class="update-open">{{if .Exploited}}<b class="exploited">{{.Exploited}} exploited</b>{{end}}{{if or .Critical .High}}<span>{{.Critical}} critical, {{.High}} high</span>{{else if .Unchecked}}<span>Not checked</span>{{else if not .Exploited}}<span>None at High+</span>{{end}}</div>
+  <div class="update-action">{{if and $.CanAct .Button}}<form class="act{{if .Primary}} act-primary{{end}}" method="post" action="/update"><input type="hidden" name="row" value="{{.App}}"><input type="hidden" name="min" value="{{$.Filter}}"><button type="submit"{{if and .Primary $.Busy}} disabled{{end}}>{{if $.Updating}}Updating…{{else}}{{.Button}}{{end}}</button></form>{{else}}<span class="update-none">{{if .Button}}{{.Button}}{{else}}Nothing to press{{end}}</span>{{end}}</div>
+</div>{{end}}{{end}}
+{{define "other"}}<div class="other">
+  {{template "icon" .}}
+  <span class="other-name">{{.Name}}{{if .Facts.Running}}<span class="dot" title="Running" role="img" aria-label="Running"></span>{{end}}</span>
+  <span class="other-version">{{with .Facts.Version}}v{{.}}{{end}}</span>
+  <span class="other-update">{{if .UpdateAvailable}}<span class="tag">v{{.Facts.Latest}} available</span>{{else if .Current}}latest{{end}}</span>
+  {{with .Caveat}}<span class="other-note">{{.}}</span>{{end}}
+</div>{{end}}
+</body>
+</html>

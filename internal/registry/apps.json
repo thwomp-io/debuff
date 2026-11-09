@@ -1,0 +1,29 @@
+{
+  "format": 1,
+  "apps": [
+    {"id": "org.mozilla.firefox", "name": "Firefox", "cask": "firefox", "cpe": "mozilla:firefox", "check": "140.0", "evidence": "https://www.mozilla.org/security/advisories/", "why": "Browser: loads whatever it's pointed at", "exposure": 3, "verified": "2026-11-03"},
+    {"id": "org.mozilla.thunderbird", "name": "Thunderbird", "cask": "thunderbird", "cpe": "mozilla:thunderbird", "check": "140.0", "evidence": "https://www.mozilla.org/security/advisories/", "why": "Renders inbound email", "exposure": 3, "verified": "2026-11-03"},
+    {"id": "com.apple.Safari", "name": "Safari", "cpe": "apple:safari", "check": "18.0", "evidence": "https://support.apple.com/en-us/100100", "why": "Browser: loads whatever it's pointed at", "exposure": 3, "verified": "2026-11-03"},
+    {"id": "com.google.Chrome", "name": "Google Chrome", "cask": "google-chrome", "cpe": "google:chrome", "check": "140.0.7339.80", "evidence": "https://chromereleases.googleblog.com/", "why": "Browser: loads whatever it's pointed at", "exposure": 3, "verified": "2026-11-03"},
+    {"id": "com.brave.Browser", "name": "Brave", "cask": "brave-browser", "cpe": "brave:brave", "check": "1.0.0", "evidence": "https://brave.com/latest/", "why": "Browser: loads whatever it's pointed at", "exposure": 3, "verified": "2026-11-03"},
+    {"id": "com.microsoft.edgemac", "name": "Microsoft Edge", "cask": "microsoft-edge", "cpe": "microsoft:edge_chromium", "check": "140.0.3485.54", "evidence": "https://learn.microsoft.com/en-us/deployedge/microsoft-edge-relnotes-security", "why": "Browser: loads whatever it's pointed at", "exposure": 3, "verified": "2026-11-03"},
+    {"id": "org.libreoffice.script", "name": "LibreOffice", "cask": "libreoffice", "cpe": "libreoffice:libreoffice", "check": "7.0.0", "evidence": "https://www.libreoffice.org/about-us/security/advisories/", "why": "Opens documents, which can come from anywhere", "exposure": 2, "parts": 3, "verified": "2026-11-03"},
+    {"id": "org.videolan.vlc", "name": "VLC", "cask": "vlc", "cpe": "videolan:vlc_media_player", "check": "3.0.0", "evidence": "https://www.videolan.org/security/", "why": "Plays media files, which can come from anywhere", "exposure": 2, "verified": "2026-11-03"},
+    {"id": "com.microsoft.VSCode", "name": "Visual Studio Code", "cask": "visual-studio-code", "cpe": "microsoft:visual_studio_code", "check": "1.60.0", "evidence": "https://github.com/microsoft/vscode/security/advisories", "why": "Editor: opens repositories and runs extensions", "exposure": 2, "verified": "2026-11-03"},
+    {"id": "us.zoom.xos", "name": "Zoom", "cask": "zoom", "cpe": "zoom:meetings", "check": "5.0.0", "evidence": "https://www.zoom.com/en/trust/security-bulletin/", "why": "Handles calls and links from other people", "exposure": 3, "verified": "2026-11-03"},
+    {"id": "com.tinyspeck.slackmacgap", "name": "Slack", "cask": "slack", "why": "Renders inbound messages and media", "exposure": 3},
+    {"id": "com.docker.docker", "name": "Docker Desktop", "cask": "docker-desktop", "cpe": "docker:desktop", "check": "4.0.0", "evidence": "https://docs.docker.com/security/security-announcements/", "why": "Runs containers with reach into this machine", "exposure": 2, "verified": "2026-11-03"},
+    {"id": "org.wireshark.Wireshark", "name": "Wireshark", "cask": "wireshark-app", "cpe": "wireshark:wireshark", "check": "3.0.0", "evidence": "https://www.wireshark.org/security/", "why": "Parses traffic and capture files from anywhere", "exposure": 2, "verified": "2026-11-03"},
+    {"id": "org.inkscape.Inkscape", "name": "Inkscape", "cask": "inkscape", "why": "Opens image files, which can come from anywhere", "exposure": 1},
+    {"id": "org.gimp.gimp-2.10", "name": "GIMP", "cask": "gimp", "cpe": "gimp:gimp", "check": "2.10.0", "evidence": "https://www.gimp.org/news/", "why": "Opens image files, which can come from anywhere", "exposure": 1, "verified": "2026-11-03"},
+    {"id": "com.microsoft.Word", "name": "Microsoft Word", "cask": "microsoft-word", "why": "Opens documents, which can come from anywhere", "exposure": 2, "parts": 2},
+    {"id": "com.microsoft.Excel", "name": "Microsoft Excel", "cask": "microsoft-excel", "why": "Opens documents, which can come from anywhere", "exposure": 2, "parts": 2},
+    {"id": "com.microsoft.Powerpoint", "name": "Microsoft PowerPoint", "cask": "microsoft-powerpoint", "why": "Opens documents, which can come from anywhere", "exposure": 2, "parts": 2},
+    {"id": "com.microsoft.Outlook", "name": "Microsoft Outlook", "cask": "microsoft-outlook", "why": "Renders inbound email", "exposure": 3, "parts": 2},
+    {"id": "io.tailscale.ipn.macsys", "name": "Tailscale", "cask": "tailscale-app", "why": "Holds this machine's VPN connection", "exposure": 2},
+    {"id": "com.1password.1password", "name": "1Password", "cask": "1password", "why": "Holds credentials", "exposure": 2},
+    {"id": "com.googlecode.iterm2", "name": "iTerm2", "cask": "iterm2", "why": "Terminal: renders output from anything it runs", "exposure": 2},
+    {"id": "com.hnc.Discord", "name": "Discord", "cask": "discord", "why": "Renders inbound messages and media", "exposure": 3},
+    {"id": "com.postmanlabs.mac", "name": "Postman", "cask": "postman", "why": "Makes requests and holds API credentials", "exposure": 2}
+  ]
+}
