@@ -1,6 +1,4 @@
-<img src="docs/assets/icon.svg" alt="" width="96" align="right">
-
-# Debuff
+# <img src="docs/assets/icon.svg" alt="" width="36" align="top"> Debuff
 
 A morning check of your own Mac's vulnerability exposure, opened in a browser tab like a mailbox. Each app
 gets a card, ranked by what could actually hurt you, including the bundled runtimes that stock scanners

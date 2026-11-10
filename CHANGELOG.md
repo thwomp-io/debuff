@@ -4,6 +4,11 @@ All notable changes, [Keep a Changelog](https://keepachangelog.com/) style, SemV
 
 ## [Unreleased]
 
+## [0.16.2] — 2026-11-09
+
+### Fixed
+- The README's icon sits in the title line. Floated beside the title, the title's rule ran through it on GitHub.
+
 ## [0.16.1] — 2026-11-09
 
 ### Changed
