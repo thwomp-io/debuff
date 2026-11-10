@@ -27,11 +27,11 @@ done
 	cat "$tmp/log"
 	exit 1
 }
-node scripts/tour.mjs "$PLAYWRIGHT_DIR" "$url/?token=$(cat "$tmp/state/token")" "$tmp/video" "${1:-dark}"
+node scripts/tour.mjs "$PLAYWRIGHT_DIR" "$url/?token=$(cat "$tmp/state/token")" "$tmp/video" "${1:-light}"
 video=$(ls "$tmp"/video/*.webm | head -1)
 out=docs/assets/tour.gif
 mkdir -p "$(dirname "$out")"
 ffmpeg -loglevel error -y -i "$video" -vf "fps=5,scale=960:-1:flags=lanczos,palettegen=max_colors=64" "$tmp/palette.png"
 ffmpeg -loglevel error -y -i "$video" -i "$tmp/palette.png" -lavfi "fps=5,scale=960:-1:flags=lanczos[x];[x][1:v]paletteuse=dither=none" "$tmp/tour.gif"
-gifsicle -O3 --lossy=80 "$tmp/tour.gif" -o "$out"
+gifsicle -O3 --lossy=120 "$tmp/tour.gif" -o "$out"
 echo "$out ($(($(stat -f %z "$out") / 1024)) KB)"

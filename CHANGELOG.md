@@ -4,6 +4,12 @@ All notable changes, [Keep a Changelog](https://keepachangelog.com/) style, SemV
 
 ## [Unreleased]
 
+## [0.16.1] — 2026-11-09
+
+### Changed
+- The README's screenshots and recorded tour show the light theme. `scripts/tour.sh` records light by default
+  (`scripts/tour.sh dark` for the other), and `just shots` adds laptop and phone shots in light.
+
 ## [0.16.0] — 2026-11-09
 
 ### Added

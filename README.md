@@ -47,13 +47,14 @@ just status        # is it up, and is what's running what's installed?
 
 | Inbox | A finding, opened |
 |---|---|
-| ![Inbox, dark theme](docs/assets/inbox-dark.png) | ![An opened finding, light theme](docs/assets/finding-light.png) |
+| ![Inbox](docs/assets/inbox-light.png) | ![An opened finding](docs/assets/finding-light.png) |
 
 | Updates | On a phone-sized window |
 |---|---|
-| ![Updates page, light theme](docs/assets/updates-light.png) | <img src="docs/assets/phone-dark.png" alt="Phone layout" width="300"> |
+| ![Updates page](docs/assets/updates-light.png) | <img src="docs/assets/phone-light.png" alt="Phone layout" width="300"> |
 
-All four are the bundled sample data (`debuff serve --demo`).
+All four are the bundled sample data (`debuff serve --demo`). There is a dark theme too; the page follows your
+system setting.
 
 - **Inbox**: one card per app with open findings, and a list of everything else on the machine below it.
   A severity control hides Medium and Low by default; a known-exploited finding always shows.

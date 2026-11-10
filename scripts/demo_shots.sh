@@ -39,6 +39,8 @@ scripts/shot.sh "$url&sample=many" "$out/many-phone-dark.png" phone dark
 scripts/shot.sh "$url&sample=many" "$out/many-open-light.png" 2555x1209 light ".card:nth-child(2) .findings summary"
 scripts/shot.sh "$url" "$out/inbox-light.png" 2555x1209 light
 scripts/shot.sh "$url" "$out/laptop-dark.png" desktop dark
+scripts/shot.sh "$url" "$out/laptop-light.png" desktop light
+scripts/shot.sh "$url" "$out/phone-light.png" phone light
 scripts/shot.sh "$url" "$out/row-open-light.png" desktop light "$open"
 scripts/shot.sh "$url&min=all" "$out/all-dark.png" desktop dark
 scripts/shot.sh "$url&app=Example+Mail&min=all" "$out/app-dark.png" desktop dark
