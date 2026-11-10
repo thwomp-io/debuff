@@ -437,3 +437,14 @@ func FuzzHostAllowed(f *testing.F) {
 		}
 	})
 }
+
+func TestIconIsServedAsSVG(t *testing.T) {
+	rec := request(t, "/icon.svg", "127.0.0.1:8737", "")
+	if rec.Code != http.StatusOK || rec.Header().Get("Content-Type") != "image/svg+xml" || !strings.HasPrefix(rec.Body.String(), "<svg") {
+		t.Fatalf("icon: %d %q", rec.Code, rec.Header().Get("Content-Type"))
+	}
+	// An SVG can carry script; the policy on every response is what keeps one inert.
+	if !strings.Contains(rec.Header().Get("Content-Security-Policy"), "default-src 'none'") {
+		t.Fatal("the icon went out without the content policy")
+	}
+}

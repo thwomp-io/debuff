@@ -1,0 +1,33 @@
+name: CodeQL
+
+# Static analysis of this code, complementing the vulnerability scanners. Results land in the Security tab.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "27 4 * * 1" # weekly: new query rules against unchanged code
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: analyze (go)
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write # upload findings to the Security tab
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+      - uses: github/codeql-action/init@v4
+        with:
+          languages: go
+      - uses: github/codeql-action/autobuild@v4
+      - uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:go"

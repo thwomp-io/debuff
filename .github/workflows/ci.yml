@@ -3,9 +3,11 @@ name: CI
 on:
   push:
     branches: [main]
+    tags: ["v*"]
   pull_request:
     branches: [main]
 
+# Least privilege by default.
 permissions:
   contents: read
 
@@ -14,21 +16,83 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # ---- The code: format, vet, lint (gosec included), race tests, fuzzing, a reproducible build -----
   test:
-    name: vet · test · build
+    name: test (lint · race · fuzz · build)
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
-      - run: go vet ./...
-      - run: go test -race -count=1 ./...
-      - run: scripts/build.sh
-      - name: Smoke
+      - name: Tools
+        run: brew install golangci-lint
+      - name: Format
+        run: golangci-lint fmt --diff
+      - name: go.mod tidy + verify
+        run: go mod tidy -diff && go mod verify
+      - name: Vet
+        run: go vet ./...
+      - name: Lint
+        run: golangci-lint run
+      - name: Tests (-race)
+        run: go test -race -count=1 ./...
+      - name: Fuzz (5s per target)
         run: |
-          dist/debuff version
+          for pkg in $(go list ./...); do
+            for t in $(go test -list '^Fuzz' "$pkg" | grep '^Fuzz' || true); do
+              echo "$t ($pkg)"
+              go test -run '^$' -fuzz "^$t\$" -fuzztime 5s "$pkg"
+            done
+          done
+      - name: Reproducible build
+        run: |
+          scripts/build.sh /tmp/a && scripts/build.sh /tmp/b
+          cmp /tmp/a /tmp/b
+          test "$(/tmp/a version)" = "$(cat internal/version/VERSION)"
+      - name: Smoke (the built server, probed from outside)
+        run: |
           dir=$(mktemp -d)
-          dist/debuff serve --demo --addr 127.0.0.1:8737 --state-dir "$dir" &
+          /tmp/a serve --addr 127.0.0.1:8737 --state-dir "$dir" &
           sleep 2
-          dist/debuff health
+          /tmp/a health
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8737/)" = 401
+          test "$(curl -s -o /dev/null -w '%{http_code}' -H 'Host: evil.example' http://127.0.0.1:8737/healthz)" = 403
+          test "$(stat -f '%Lp' "$dir")" = 700
+
+  # ---- Security: known vulnerabilities in the module and the standard library, strict ---------------
+  # Both scanners default to dropping a vulnerability that static analysis finds no call to, and exit 0.
+  # "Not called" is an inference, so here any known vulnerability stops the build.
+  vulns:
+    name: security (govulncheck · osv-scanner)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+      - name: govulncheck
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+          govulncheck -C cmd/debuff -scan module
+      - name: osv-scanner
+        run: |
+          go install github.com/google/osv-scanner/v2/cmd/osv-scanner@latest
+          osv-scanner scan --no-call-analysis=all --lockfile=go.mod
+
+  # ---- Security: secrets + misconfiguration + dependency scan over the repo (Trivy) -----------------
+  trivy:
+    name: security (trivy fs)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Trivy filesystem scan
+        # Run from the official image (no install step); the repo token dodges registry rate limits.
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}:/scan" \
+            -e TRIVY_USERNAME="${{ github.actor }}" \
+            -e TRIVY_PASSWORD="${{ secrets.GITHUB_TOKEN }}" \
+            aquasec/trivy:0.76.1 fs \
+              --scanners vuln,secret,misconfig \
+              --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 --no-progress /scan

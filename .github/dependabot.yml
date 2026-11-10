@@ -1,0 +1,11 @@
+version: 2
+# The module has no dependencies; these keep the toolchain line and the CI workflows themselves current.
+updates:
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

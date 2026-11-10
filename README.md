@@ -1,3 +1,5 @@
+<img src="docs/assets/icon.svg" alt="" width="96" align="right">
+
 # Debuff
 
 A morning check of your own Mac's vulnerability exposure, opened in a browser tab like a mailbox. Each app

@@ -30,7 +30,7 @@ import (
 	"github.com/thwomp-io/debuff/internal/version"
 )
 
-//go:embed web/index.html web/style.css
+//go:embed web/index.html web/style.css web/icon.svg
 var web embed.FS
 
 const csp = "default-src 'none'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"
@@ -173,6 +173,16 @@ func Handler(port string, info version.Info, opt Options) http.Handler {
 			return
 		}
 		w.Header().Set("Content-Type", "text/css; charset=utf-8")
+		_, _ = w.Write(b)
+	})
+	mux.HandleFunc("GET /icon.svg", func(w http.ResponseWriter, _ *http.Request) {
+		b, err := web.ReadFile("web/icon.svg")
+		if err != nil {
+			http.Error(w, "missing asset", http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "image/svg+xml")
+		w.Header().Set("Cache-Control", "public, max-age=86400")
 		_, _ = w.Write(b)
 	})
 	if opt.Icons != "" {

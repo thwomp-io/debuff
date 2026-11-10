@@ -4,6 +4,15 @@ All notable changes, [Keep a Changelog](https://keepachangelog.com/) style, SemV
 
 ## [Unreleased]
 
+## [0.16.0] — 2026-11-09
+
+### Added
+- An icon: a polished dark stone carved with a falling mark, on a slate tile. It is the page's favicon, sits beside
+  the name in the side panel, and heads the README. Like every page asset it needs the sign-in.
+- CI on every push and pull request: format, vet, lint, race tests, fuzzing, a reproducible build and an outside
+  probe of the built server on macOS; `govulncheck` and `osv-scanner` in their strict modes; a Trivy scan for secrets
+  and misconfiguration; CodeQL; and Dependabot for the toolchain line and the workflows.
+
 ## [0.15.0] — 2026-11-09
 
 ### Added
