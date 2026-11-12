@@ -4,6 +4,12 @@ All notable changes, [Keep a Changelog](https://keepachangelog.com/) style, SemV
 
 ## [Unreleased]
 
+## [0.16.3] — 2026-11-11
+
+### Security
+- Built with Go 1.27.4, which fixes GO-2026-6859 in `net/http`. `govulncheck` reported it in the 0.16.2 binary,
+  built with 1.27.3.
+
 ## [0.16.2] — 2026-11-09
 
 ### Fixed
